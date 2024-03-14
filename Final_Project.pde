@@ -1,10 +1,10 @@
-Table table;
+//Table table;
 PImage backgroundImage;
 PImage barChartImage;
-int x;
-int y;
-int a;
-int b;
+//int x;
+//int y;
+//int a;
+//int b;
 
 final int SCREENX = 800;
 final int SCREENY = 600;
@@ -13,20 +13,20 @@ void settings()
 {
   size(SCREENX, SCREENY);
 }
-void setup() {
-  table = loadTable("flights_full.csv", "header");
+//void setup() {
+ // table = loadTable("flights_full.csv", "header");
   
-  println(table.getRowCount() + " total rows in table");
-  println(table.getColumnCount() + " total colums in table");
+  //println(table.getRowCount() + " total rows in table");
+  //println(table.getColumnCount() + " total colums in table");
   
-  backgroundImage = loadImage("plane.jpg");
-  barChartImage = loadImage("barChart.jpeg");
+ // backgroundImage = loadImage("plane.jpg");
+  //barChartImage = loadImage("barChart.jpeg");
    
-   x=50;
-   y=20;
-   a=10;
-   b=510;
-}
+  // x=50;
+  // y=20;
+  // a=10;
+  // b=510;
+//}        add the commented out code to the flights project class
 void draw()
 {
   background(120,0,70);
