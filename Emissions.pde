@@ -1,3 +1,4 @@
+//jamie
 class Emissions{
   //must create an array for each flight and details
   // uses distance specified in each value in the array to find the carbon emissions for each flight
