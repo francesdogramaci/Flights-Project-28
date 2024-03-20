@@ -1,37 +1,53 @@
-// project week one 
+
 Table table;
 
-String[] originAirports;
-String[] destinationAirports;
-float[] distances;
-float[] calculatedEmissions;
-//Emissions emissions[];
+ArrayList<Flight> flightData;
+
 
 void setup() {
   table = loadTable("flights_full.csv", "header");
   
-  println(table.getRowCount() + " total rows in table");
-  println(table.getColumnCount() + " total columns in table");
-  
-  originAirports = new String[table.getRowCount()];
-  destinationAirports = new String[table.getRowCount()];
-  distances = new float[table.getRowCount()];
-  //emissions = new Emissions[table.getRowCount()];
-  
+  flightData = new ArrayList<>();
   sortData();
+  
+  String originAirport = "LAX";
+  String departureDate = "01/01/2022 00:00";
+  
+  getInfo(originAirport, departureDate);
 }
 
 
 void sortData() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < table.getRowCount(); i++){
     TableRow row = table.getRow(i);
-    originAirports[i] = row.getString("ORIGIN");
-    destinationAirports[i] = row.getString("DEST");
-    distances[i] = row.getInt("DISTANCE");
-    //calculatedEmissions[i] = emissions[i].calculateEmissions(distances[i]);
+    String originAirport = row.getString("ORIGIN");
+    String destinationAirport = row.getString("DEST");
+    String departureDate = row.getString("FL_DATE");
+    float distance = row.getFloat("DISTANCE");
+    int cancelled = row.getInt("CANCELLED");
     
-     int flightNumber = i + 1;
-     println("Flight " + flightNumber + " of the month flew from " + originAirports[i] + " to " + destinationAirports[i] + 
-             ". It flew a total of " + distances[i] + " miles.");
+    Flight flight = new Flight(originAirport, destinationAirport, departureDate, distance, cancelled);
+    flightData.add(flight);
+  }
+}
+
+void getInfo(String originAirport, String departureDate) {
+  ArrayList<Flight> sortedFlights = new ArrayList<>();
+  
+  for (Flight flight : flightData) {
+    if (flight.getDate().equals(departureDate) && flight.getOrigin().equals(originAirport)) {
+      sortedFlights.add(flight);
+    }
+  }
+  
+  println("Departure board for " + departureDate + " from " + originAirport + ": ");
+  
+  String cancelled;
+  for(Flight flight : sortedFlights) {
+    if(flight.getCancelled() == 1) {
+      cancelled = "Cancelled";
+    } else cancelled = "Departed";
+    
+    println("Destination: " + flight.getDestination() + ", Distance: " + flight.getDistance() + ", Status: " + cancelled);
   }
 }
