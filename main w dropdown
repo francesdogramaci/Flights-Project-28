@@ -1,0 +1,77 @@
+// frances
+// ignore anything commented out u dont need it
+PImage backgroundImage;
+PImage barChartImage;
+
+final int SCREENX = 800;
+final int SCREENY = 600;
+int x=50;
+int y=20;
+int  a=10;
+int  b=510;
+//int mx;
+//int my;
+import controlP5.*;
+
+ControlP5 cp5;
+Dropdown dropdown;
+SearchBar searchBar;
+
+void settings () {
+  size(SCREENX, SCREENY);
+}
+
+void setup() {
+  //   size(400, 300);
+  cp5 = new ControlP5(this);
+  dropdown = new Dropdown(cp5);
+  backgroundImage = loadImage("plane.jpg");
+  searchBar = new SearchBar(50, 50, 200, 30);
+
+}
+
+void draw() {
+  background(120, 0, 70);
+  image(backgroundImage, 0, 0, 800, 600);
+  searchBar.draw(color(0), color(255), color(0), color(0));
+//   search.drawSearchBar(); 
+  
+  // dropdown label
+  fill(0);
+  text("How would you like to represent your data?", 400, 125);
+  
+
+  //creating a moving title screen
+  noStroke();
+  fill(0);
+  rect(x, y, 200, 50);
+
+  fill(255, 190, 250);
+  textAlign(CENTER, CENTER);
+  text("What is your flights CO2 Emissions?", x+100, y+25); //adjust co ords to centre text
+  textSize(13);
+  if (x++>=800) x=-400;
+
+  //image(barChartImage, 50, 400, 100, 100);
+  //fill(250);
+  //textAlign(20, 400);
+  //text("Click to view Emissions bar chart", a+10, b+2);
+  //textSize(10);
+  
+  // draw methods
+}
+
+void keyPressed() {
+  searchBar.keyPressed(key, keyCode);
+//  searchBar.draw();
+  searchBar.mousePressed(searchBar.mx, searchBar.my);
+  searchBar.keyPressed(key, keyCode);
+}
+
+//void keyTyped() {
+//  search.keyTyped();
+//}
+
+void controlEvent(ControlEvent event) {
+  dropdown.controlEvent(event);
+}
