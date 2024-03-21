@@ -27,8 +27,8 @@ void draw(){
   textFont(titleFont, 30);
   text ("departures", FIRST_COLUMN_LOCATION+DISTANCE_BETWEEN_COLUMNS, TITLE_LOCATION);
   textFont(titleFont, 20);
-  text (hour() +":"+ minute(), FIRST_COLUMN_LOCATION+(DISTANCE_BETWEEN_COLUMNS*2), TITLE_LOCATION);
-  textFont(headerFont, 15);
+  String minute = (minute()<10)? "0":"";
+  text (hour() +":" +minute +minute(), FIRST_COLUMN_LOCATION+(DISTANCE_BETWEEN_COLUMNS*2), TITLE_LOCATION);  textFont(headerFont, 15);
   text (("DATE/TIME"), FIRST_COLUMN_LOCATION, HEADER_LOCATION);
   text (("CITY ORIGIN"), FIRST_COLUMN_LOCATION+DISTANCE_BETWEEN_COLUMNS, HEADER_LOCATION);
   text (("CITY DESTINATION"), FIRST_COLUMN_LOCATION+(DISTANCE_BETWEEN_COLUMNS*2), HEADER_LOCATION);
