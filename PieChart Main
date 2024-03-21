@@ -1,0 +1,40 @@
+Table table;
+String[] originAirports;
+String[] destinationAirports;
+float[] distances;
+int[] scheduledDep; // added for pie chart
+int[] actualDep; // added for pie chart
+PieChart pieChart;
+
+void setup() {
+  size(400, 400);
+  table = loadTable("flights_full.csv", "header");
+  
+  println(table.getRowCount() + " total rows in table");
+  println(table.getColumnCount() + " total columns in table");
+  originAirports = new String[table.getRowCount()];
+  destinationAirports = new String[table.getRowCount()];
+  distances = new float[table.getRowCount()];
+  scheduledDep = new int[table.getRowCount()]; // added for pie chart
+  actualDep = new int[table.getRowCount()]; // added for pie chart
+  
+  
+  
+  for (int i = 0; i < table.getRowCount(); i++) {
+    TableRow row = table.getRow(i);
+    originAirports[i] = row.getString("ORIGIN");
+    destinationAirports[i] = row.getString("DEST");
+    distances[i] = row.getFloat("DISTANCE");
+    scheduledDep[i] = row.getInt("CRS_DEP_TIME"); // added for pie chart
+    actualDep[i] = row.getInt("DEP_TIME"); // added for pie chart
+  }
+  
+  // Initialize PieChart instance with data
+  pieChart = new PieChart(scheduledDep, actualDep);
+  pieChart.countFlights();
+  
+}
+
+void draw() {
+  pieChart.draw();
+}
