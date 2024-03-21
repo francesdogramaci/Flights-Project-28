@@ -1,5 +1,5 @@
 Table table;
-PImage plane;
+PImage planeIcon;
 final int DISTANCE_BETWEEN_ROWS = 25;
 final int TITLE_LOCATION = 30;
 final int HEADER_LOCATION = TITLE_LOCATION+50;
@@ -17,12 +17,12 @@ void setup(){
   titleFont = loadFont("Optima-BoldItalic-30.vlw");
   bodyFont = loadFont("AlNile-20.vlw");
   headerFont = loadFont("AlBayan-Bold-40.vlw");
-  plane = loadImage ("IMG_PLANE.jpeg");
+  planeIcon = loadImage ("IMG_PLANE_ICON.jpeg");
 }
 
 void draw(){
   background(255);
-  image(plane, FIRST_COLUMN_LOCATION, TITLE_LOCATION - (plane.height/2));
+  image(planeIcon, FIRST_COLUMN_LOCATION, TITLE_LOCATION - (planeIcon.height/2));
   fill(0);
   textFont(titleFont, 30);
   text ("departures", FIRST_COLUMN_LOCATION+DISTANCE_BETWEEN_COLUMNS, TITLE_LOCATION);
