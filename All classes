@@ -1,0 +1,366 @@
+PImage backgroundImage;
+PImage fakeChartImage;
+Table table;
+PFont stdFont; //variable to store font
+
+ArrayList<Flight> flightDataDB; // DB = Departure Board
+
+int selectedOption = -1;
+int x=50;
+int y=20;
+int  a=10;
+int  b=510;
+import controlP5.*;
+
+final int SCREENX = 800;
+final int SCREENY = 600;
+final int EVENT_BARCHART_BACK = 5;
+final int EVENT_NULL = 0;
+final int EVENT_BUTTON1 = 1;
+final int EVENT_FORWARD = 2;
+final int EVENT_BUTTON2 = 3;
+final int EVENT_BACKWARD = 4;
+
+ControlP5 cp5;
+Dropdown dropdown;
+SearchBar searchBar;
+SearchBar searchBar2;
+BarChart barChart;
+
+Screen currentScreen, screen1, screen2;
+
+void settings()
+{
+  size(SCREENX, SCREENY);
+}
+
+void setup() {
+  table = loadTable("flights_full.csv", "header");
+  cp5 = new ControlP5(this);
+  dropdown = new Dropdown(cp5);
+  stdFont = createFont("Chalkboard-30", 30);
+  textFont(stdFont);
+  textAlign(CENTER, CENTER);
+  
+  backgroundImage = loadImage("plane.jpg");
+  searchBar = new SearchBar(50, 300, 200, 30);
+  searchBar2 = new SearchBar(550, 300, 200, 30);
+  barChart = new BarChart();
+
+  flightDataDB = new ArrayList<>();  
+  
+  sortData();
+  
+  // Stand-in for User Input
+  String originAirport = "LAX";
+  String departureDate = "01/01/2022 00:00";
+  
+  getInfo(originAirport, departureDate);
+  //creating two screen objects 
+  screen1 = new Screen();//(backgroundImage);
+  screen2 = new Screen();//(fakeChartImage);
+  
+    //Widget widget1 = new Widget(100, 100, 180, 40, "VIEW CO2", color(172, 10, 173), stdFont, EVENT_BUTTON1);
+  Widget widget1 = new Widget(350, 400, 75, 25, "      GO!", color(255, 182, 193), stdFont, EVENT_FORWARD);
+  //Widget widget3 = new Widget(100, 100, 180, 40, "Bar Chart", color(172, 10, 173), stdFont, EVENT_BUTTON2); 
+  Widget widget4 = new Widget(325, 50, 180, 30, "                                  Main Screen", color(255, 182, 193), stdFont, EVENT_BACKWARD);
+  
+  //adding widgets to the screen
+   screen1.add(widget1);
+   //screen1.add(widget2);
+   //screen2.add(widget3);
+   screen2.add(widget4);
+   
+   currentScreen = screen1;
+}
+void draw()
+{
+  if(currentScreen == screen1){
+  background(120,0,70);
+  image(backgroundImage, 0, 0, 800, 600);
+  searchBar.draw(color(0), color(255), color(0), color(0));
+  searchBar2.draw(color(0), color(255), color(0), color(0));
+  
+  //dropdown label
+  fill(0);
+  text("Heres how we can represent your data", 280, 125);
+  
+  // departure text label
+  fill(255);
+  rect(50, 268, 200, 20);
+  textSize(20);
+  fill(0);
+  text("Departure Airport:", 50, 275);
+  
+  // time text label
+  fill(255);
+  rect(550, 268, 200, 20);
+  textSize(20);
+  fill(0);
+  text("Departure Time:", 550, 275);
+  
+  // Set dropdown visibility
+    dropdown.setVisible(true);
+
+  //creating a moving title screen
+  noStroke(); 
+  //fill(0);
+ // rect(x, y, 200, 50);
+  
+  fill(255, 182, 193);
+  textAlign(CENTER, CENTER);
+  text("What is your flights CO2 Emissions?", x+100, y+25); //adjust co ords to centre text
+  textSize(13);
+  if(x++>=800) x=-400;
+ 
+  }
+  else if(currentScreen == screen2){
+    background(255);
+    currentScreen.draw();
+    // Set dropdown visibility
+    dropdown.setVisible(false);
+  }
+  
+  currentScreen.draw();
+}
+void mousePressed(){
+  int event = currentScreen.getEvent(mouseX, mouseY); //getting event based on mouse position
+  
+  //handling diff events based on clicked button
+  switch (event) {
+    case EVENT_BUTTON1:
+      println("button 1!");
+      break;
+    case EVENT_BUTTON2:
+      println("button 2!");
+      break;
+    case EVENT_FORWARD:
+      println("bar chart"); 
+      
+      currentScreen = screen2;
+      
+      break;
+    case EVENT_BACKWARD:
+      println("main screen"); 
+      currentScreen = screen1;
+      break;
+    default:
+      if(currentScreen == screen1 && event == EVENT_FORWARD){
+        println("creating new screen");
+        Screen newScreen = new Screen();
+        currentScreen = newScreen;
+      }
+      break;
+  }
+   if (currentScreen == screen2 && event == EVENT_FORWARD) {
+    // Draw the Bar chart
+    barChart.draw();
+  }
+  }
+
+
+void keyPressed() {
+  searchBar.keyPressed(key, keyCode);
+  searchBar.mousePressed(mouseX, mouseY);
+  searchBar.keyPressed(key, keyCode);
+  searchBar2.mousePressed(mouseX, mouseY);
+  searchBar2.keyPressed(key, keyCode);
+}
+
+void controlEvent(ControlEvent event) {
+  dropdown.controlEvent(event);
+}
+
+void sortData() {
+  for (int i = 0; i < table.getRowCount(); i++){
+    TableRow row = table.getRow(i);
+    String originAirport = row.getString("ORIGIN");
+    String destinationAirport = row.getString("DEST");
+    String departureDate = row.getString("FL_DATE");
+    float distance = row.getFloat("DISTANCE");
+    int cancelled = row.getInt("CANCELLED");
+    
+    Flight flight = new Flight(originAirport, destinationAirport, departureDate, distance, cancelled);
+    flightDataDB.add(flight);
+  }
+}
+
+void getInfo(String originAirport, String departureDate) {
+  ArrayList<Flight> DBSortedFlights = new ArrayList<>();
+  
+  for (Flight flight : flightDataDB) {
+    if (flight.getDate().equals(departureDate) && flight.getOrigin().equals(originAirport)) {
+      DBSortedFlights.add(flight);
+    }
+  }
+  
+  
+  println("Departure board for " + departureDate + " from " + originAirport + ": ");
+  for(Flight flight : DBSortedFlights) {
+    float emissions; String cancelled;
+    if(flight.getCancelled() == 1) {
+      emissions = 0;
+      cancelled = "Cancelled";
+    } else {
+      Emissions emissionCalc = new Emissions(flight.getDistance());
+      emissions = emissionCalc.calculateEmissions();
+      cancelled = "Departed";
+    }
+    
+    println("Destination: " + flight.getDestination() + ", Distance: " + flight.getDistance() + " miles, Status: " 
+    + cancelled + ", Emissions: " + emissions + " kg");
+  }
+}
+
+screen class:
+class Screen {
+  ArrayList<Widget> screenWidgets;
+  color screenColor;
+  
+  //final int EVENT_NULL = 0;
+  
+  Screen(){
+    screenWidgets = new ArrayList<Widget>(); //initialising the list
+  }
+  //method to add widgets to the screen
+  void add(Widget w){
+    screenWidgets.add(w);
+  }
+  
+  void draw(){
+    //looping through widgets and getting each widget, casting from object to widget
+    for(int i = 0; i<screenWidgets.size(); i++){
+      Widget aWidget = (Widget)screenWidgets.get(i);
+      aWidget.draw();
+    }
+    
+    if(this == screen2){
+      barChart.draw();
+    }
+  }
+  
+  int getEvent(int mx, int my){
+ //looping through each element in the screenWidgets arrayList
+for(int i = 0; i<screenWidgets.size(); i++){
+  //every iteration gets the widget at the index from the arrayList and casts it
+  //from type object to type widget
+  Widget aWidget = (Widget) screenWidgets.get(i); 
+  //calling the getEvent() method on the current widget and passing the mouse co ords through
+  int event = aWidget.getEvent(mouseX,mouseY); 
+  //returns the event associated with the widget if mouse is in widget bounds
+  if(event != EVENT_NULL){
+        return event; //mouse is within bounds of widget
+      }
+}
+   return EVENT_NULL;
+ }
+ //getting all widgets on the screen and returning list of widgets
+ArrayList getWidgets() {
+return screenWidgets; 
+}
+}
+
+widget class:
+public class Dropdown {
+  ControlP5 cp5;
+  DropdownList dropdownList;
+
+  public Dropdown(ControlP5 cp5) {
+    this.cp5 = cp5;
+     dropdownList = cp5.addDropdownList("Data Options")
+      .setPosition(350, 150)
+      .setSize(100, 100)
+      .addItem("Barchart", 0)
+      .addItem("Table", 1)
+      .addItem("Piechart", 2);
+    cp5.setColorBackground(color(120, 0, 70));
+    cp5.setColorForeground(color(255, 182, 193));
+
+  }
+
+  public void setVisible(boolean visible) {
+    dropdownList.setVisible(visible);
+  }
+  
+  public void controlEvent(ControlEvent event) {
+    if(currentScreen == screen1){
+    if (event.isGroup() && event.getController().getName().equals("dropdown")) {
+      int selected = (int) event.getValue();
+      selectedOption = (int) event.getValue();
+      String selectedOption = "";
+      switch(selected) {
+      case 0:
+        selectedOption = "Barchart";
+        currentScreen = screen2;
+        println("Switching to screen2");
+        break;
+      case 1:
+        selectedOption = "Table";
+        break;
+      case 2:
+        selectedOption = "Piechart";
+        break;
+      }
+      System.out.println("Selected option: " + selectedOption);
+      if (selectedOption.equals("Barchart")) { // Remove the semicolon here
+        currentScreen = screen2;
+      }
+    
+  }
+ 
+
+    }
+}
+}
+
+bar chart class:
+class BarChart {
+  
+int[] distanceRanges = {0, 500, 1000, 1500, 2000, 2500, 3000}; // array w distance in miles
+float[] emissions = {12, 24, 36, 48, 60, 72}; // array w corresponding CO2 emissions in tonnes
+
+int margin = 50; // margin around chart
+
+void draw() {
+  float chartWidth = width - 2 * margin;    // keeps chart off screen boundaries (x)
+  float chartHeight = height - 2 * margin;  // ^^ (y)
+  
+  float barWidth = chartWidth / (distanceRanges.length - 1); // divide chart into bars
+  float maxValue = max(emissions); // find max val in emissions array (to scale)
+  
+  rect(49, 45, 1, 305);   // y axis
+  
+  // draw bars
+  for (int i = 0; i < distanceRanges.length - 1; i++) {
+    float x = margin + i * barWidth;   // calcs x coord of currenr bar
+    float y = map(emissions[i], 0, maxValue, height - margin, margin);  // prop bars
+    fill(255, 182, 193);//(255, 150, 200); // pink <3
+    rect(x, y, barWidth, height - margin - y);
+  }
+  
+  // draw axes labels
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text("Flight Distance (in miles)", width / 2, height - 20);
+  text("CO2 emissions", margin + 10, height - 385);
+  text("(in tonnes)", margin + 10, height - 370);
+  text("0", 40, height - 50);
+  text("12", 40, height - 100);
+  text("24", 40, height - 150);
+  text("32", 40, height - 200);
+  text("48", 40, height - 250);
+  text("60", 40, height - 300);
+  text("72", 40, height - 350);
+  
+  // draw x-axis values
+  for (int i = 0; i < distanceRanges.length - 1; i++) {
+    float x = margin + i * barWidth + barWidth / 2;
+    textAlign(CENTER);    // text printed centre x axis of individual bar
+    String label = "(" + distanceRanges[i] + "-" + distanceRanges[i+1] + ")";
+    text(label, x, height - 35);
+  }
+}
+}
+
+
