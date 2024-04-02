@@ -35,8 +35,8 @@ void setup(){
   bodyFont = loadFont("AlNile-20.vlw");
   headerFont = loadFont("AlBayan-Bold-40.vlw");
   planeIcon = loadImage ("IMG_PLANE_ICON.jpeg");
-  widgetForward=new Widget(610, 470, 80, 20, "Next", color(120), bodyFont, EVENT_FORWARD);
-  widgetBackward=new Widget(20, 470, 80, 20, "Back", color(120), bodyFont, EVENT_BACKWARD);
+  widgetForward=new Widget(SCREENX-90, SCREENY-30, 80, 20, "Next", color(120), bodyFont, EVENT_FORWARD);
+  widgetBackward=new Widget(20, SCREENY-30, 80, 20, "Back", color(120), bodyFont, EVENT_BACKWARD);
   widgetCanceled=new Widget(110, SCREENY-30, 80, 20, "Canceled", color(120), bodyFont, EVENT_CANCELED);
   widgetDelayed=new Widget(SCREENX-180, SCREENY-30, 80, 20, "Delayed", color(120), bodyFont, EVENT_DELAYED);
   widgetLeftNormal=new Widget(110, SCREENY-30, 80, 20, "All flights", color(120), bodyFont, EVENT_NORMAL);
