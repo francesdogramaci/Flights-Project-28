@@ -1,0 +1,262 @@
+PImage backgroundImage;
+Table table;
+PFont stdFont; //variable to store font
+
+ArrayList<Flight> flightDataDB; // DB = Departure Board
+
+int selectedOption = -1;
+int x=50;
+int y=20;
+int  a=10;
+int  b=510;
+import controlP5.*;
+
+final int SCREENX = 800;
+final int SCREENY = 600;
+final int EVENT_BARCHART_BACK = 5;
+final int EVENT_NULL = 0;
+final int EVENT_BUTTON1 = 1;
+final int EVENT_FORWARD = 2;
+final int EVENT_BUTTON2 = 3;
+final int EVENT_BACKWARD = 4;
+final int EVENT_PIE_CHART = 6;
+final int EVENT_TABLE = 7;
+final int EVENT_TREE = 8;
+
+int[] scheduledDep;
+int[] actualDep;
+
+PieChart pieChart;
+ControlP5 cp5;
+Dropdown dropdown;
+SearchBar searchBar;
+SearchBar searchBar2;
+BarChart barChart;
+
+
+Screen currentScreen, screen1, screen2, screen3, screen4, screen5;
+
+void settings()
+{
+  size(SCREENX, SCREENY);
+}
+
+void setup() {
+  table = loadTable("flights_full.csv", "header");
+  cp5 = new ControlP5(this);
+  dropdown = new Dropdown(cp5);
+  stdFont = createFont("Chalkboard-30", 30);
+  textFont(stdFont);
+  textAlign(CENTER, CENTER);
+  
+  backgroundImage = loadImage("plane.jpg");
+  searchBar = new SearchBar(50, 300, 200, 30);
+  searchBar2 = new SearchBar(550, 300, 200, 30);
+  barChart = new BarChart();
+ 
+
+  flightDataDB = new ArrayList<>(); 
+  
+  scheduledDep = new int[table.getRowCount()];
+  actualDep = new int[table.getRowCount()];
+  
+  sortData();
+  
+  // Stand-in for User Input
+  String originAirport = "LAX";
+  String departureDate = "01/01/2022 00:00";
+  
+  getInfo(originAirport, departureDate);
+  //creating two screen objects 
+  screen1 = new Screen();// main screen
+  screen2 = new Screen();//bar chart screen
+  screen3 = new Screen(); //pie chart screen
+  screen4 = new Screen(); //table screen
+  screen5 = new Screen(); //offset emissions table
+ 
+  Widget widget1 = new Widget(250, 400, 75, 25, "           Bar Chart", color(255, 150, 200), stdFont, EVENT_FORWARD);
+  Widget widget2 = new Widget(470, 400, 75, 25, "           Pie Chart", color(255, 150, 200), stdFont, EVENT_PIE_CHART);
+  Widget widget3 = new Widget(340, 400, 115, 25, "                     Departure Table", color(255, 150, 200), stdFont, EVENT_TABLE);
+  Widget widget4 = new Widget(125, 10, 180, 30, "                                  Main Screen", color(255, 150, 200), stdFont, EVENT_BACKWARD);
+  Widget widget5 = new Widget(300, 500, 205, 25, "                                           How to offset your emissions!", color(255, 150, 200), stdFont, EVENT_TREE);
+  Widget widget6 = new Widget(50, 550, 180, 30, "               Main Screen", color(255, 150, 200), stdFont, EVENT_BACKWARD);
+  //adding widgets to the screen
+   screen1.add(widget1); //bar chart button main screen
+   screen1.add(widget2); //pie chart widget main screen
+   screen1.add(widget3); //departure table widget main screen
+   screen1.add(widget5);
+   screen2.add(widget4); //main screen button bar chart screen
+   screen4.add(widget4); //main screen button table screen 
+   screen5.add(widget4); //main screen button tree emissions screen
+   
+   
+  pieChart = new PieChart(scheduledDep, actualDep);
+  pieChart.countFlights();
+  
+  currentScreen = screen1;
+   
+  // pieChart = new PieChart(scheduledDep, actualDep);
+  // screen3.addPieChart(pieChart);
+   screen3.add(widget6); //main screen button pie chart screen
+}
+void draw()
+{
+  if(currentScreen == screen1){
+  background(120,0,70);
+  image(backgroundImage, 0, 0, 800, 600);
+  searchBar.draw(color(0), color(255), color(0), color(0));
+  searchBar2.draw(color(0), color(255), color(0), color(0));
+  
+  //dropdown label
+  fill(0);
+  text("Heres how we can represent your data:", 280, 125);
+  
+  // departure text label
+  fill(255);
+  rect(50, 268, 200, 20);
+  textSize(20);
+  fill(0);
+  text("Departure Airport:", 50, 275);
+  
+  // time text label
+  fill(255);
+  rect(550, 268, 200, 20);
+  textSize(20);
+  fill(0);
+  text("Departure Time:", 550, 275);
+  
+  // Set dropdown visibility
+    dropdown.setVisible(true);
+
+  //creating a moving title screen
+  noStroke(); 
+  //fill(0);
+ // rect(x, y, 200, 50);
+  
+  fill(255, 150, 200);
+  textAlign(CENTER, CENTER);
+  text("What is your flights CO2 Emissions?", x+100, y+25); //adjust co ords to centre text
+  textSize(13);
+  if(x++>=800) x=-400;
+ 
+  }
+  else if(currentScreen == screen2){
+    background(255);
+    currentScreen.draw();
+    // Set dropdown visibility
+    dropdown.setVisible(false);
+  }
+  else if(currentScreen == screen3){
+    background(255);
+    currentScreen.draw();
+    dropdown.setVisible(false);
+    pieChart.draw();
+  }
+  else if(currentScreen == screen4){
+    background(450, 200, 5);
+    currentScreen.draw();
+    dropdown.setVisible(false);
+  }
+  else if(currentScreen == screen5){
+    background(0);
+    currentScreen.draw();
+    dropdown.setVisible(false);
+  }
+    
+  
+  currentScreen.draw();
+}
+void mousePressed(){
+  int event = currentScreen.getEvent(mouseX, mouseY); //getting event based on mouse position
+  
+  //handling diff events based on clicked button
+  switch (event) {
+    case EVENT_TABLE:
+      println("Departure Table");
+      currentScreen = screen4;
+      break;
+    case EVENT_PIE_CHART:
+      println("Pie Chart!");
+      currentScreen = screen3;
+      break;
+    case EVENT_FORWARD :
+      currentScreen = screen2;
+      break;
+    case EVENT_BACKWARD:
+      currentScreen = screen1;
+      break;
+   case EVENT_TREE:
+       currentScreen = screen5;
+   
+    default:
+      if(currentScreen == screen1 && event == EVENT_FORWARD){
+        println("creating new screen");
+        Screen newScreen = new Screen();
+        currentScreen = newScreen;
+      }
+     
+      break;
+  }
+   if (currentScreen == screen2 && event == EVENT_FORWARD) {
+    // Draw the Bar chart
+    barChart.draw();
+  }
+ 
+  }
+
+
+void keyPressed() {
+  searchBar.keyPressed(key, keyCode);
+  searchBar.mousePressed(mouseX, mouseY);
+  searchBar.keyPressed(key, keyCode);
+  searchBar2.mousePressed(mouseX, mouseY);
+  searchBar2.keyPressed(key, keyCode);
+ 
+}
+
+void controlEvent(ControlEvent event) {
+  dropdown.controlEvent(event);
+}
+
+void sortData() {
+  for (int i = 0; i < table.getRowCount(); i++){
+    TableRow row = table.getRow(i);
+    String originAirport = row.getString("ORIGIN");
+    String destinationAirport = row.getString("DEST");
+    String departureDate = row.getString("FL_DATE");
+    float distance = row.getFloat("DISTANCE");
+    int cancelled = row.getInt("CANCELLED");
+    scheduledDep[i] = row.getInt("CRS_DEP_TIME");
+    actualDep[i] = row.getInt("DEP_TIME");
+    
+    Flight flight = new Flight(originAirport, destinationAirport, departureDate, distance, cancelled);
+    flightDataDB.add(flight);
+  }
+}
+
+void getInfo(String originAirport, String departureDate) {
+  ArrayList<Flight> DBSortedFlights = new ArrayList<>();
+  
+  for (Flight flight : flightDataDB) {
+    if (flight.getDate().equals(departureDate) && flight.getOrigin().equals(originAirport)) {
+      DBSortedFlights.add(flight);
+    }
+  }
+  
+  
+  println("Departure board for " + departureDate + " from " + originAirport + ": ");
+  for(Flight flight : DBSortedFlights) {
+    float emissions; String cancelled;
+    if(flight.getCancelled() == 1) {
+      emissions = 0;
+      cancelled = "Cancelled";
+    } else {
+      Emissions emissionCalc = new Emissions(flight.getDistance());
+      emissions = emissionCalc.calculateEmissions();
+      cancelled = "Departed";
+    }
+    
+    println("Destination: " + flight.getDestination() + ", Distance: " + flight.getDistance() + " miles, Status: " 
+    + cancelled + ", Emissions: " + emissions + " kg");
+  }
+}
