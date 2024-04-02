@@ -25,48 +25,50 @@ class Screen {
     text (("CITY DESTINATION"), FIRST_COLUMN_LOCATION+(DISTANCE_BETWEEN_COLUMNS*2), HEADER_LOCATION);
     textFont(bodyFont, 15);
     int j=0;
-    if(canceled){
-      for (int i=index; j<FLIGHTS_PER_SCREEN; i++){
-        fill(255, 0, 0);
-        if (i<=boardTable.getRowCount()){
-          if (boardTable.getFloat(i, 15)==1){
-            text (boardTable.getString(i, 0), FIRST_COLUMN_LOCATION, FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-            text (boardTable.getString(i, 4), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-            text (boardTable.getString(i, 8), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS*2), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-            j++;
+    if (boardTable!=null){
+      if(canceled){
+        for (int i=index; j<FLIGHTS_PER_SCREEN; i++){
+          fill(255, 0, 0);
+          if (i<=boardTable.getRowCount()){
+            if (boardTable.getFloat(i, 15)==1){
+              text (boardTable.getString(i, 0), FIRST_COLUMN_LOCATION, FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              text (boardTable.getString(i, 4), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              text (boardTable.getString(i, 8), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS*2), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              j++;
+            }
           }
+          else break;
+          cancelIndex=i++;
         }
-        else break;
-        cancelIndex=i++;
       }
-    }
-    else if(delayed){
-      for (int i=index; j<FLIGHTS_PER_SCREEN; i++){
-        fill(255, 125, 0);
-        if (i<=boardTable.getRowCount()){
-          if (boardTable.getFloat(i, 16)==1){
+      else if(delayed){
+        for (int i=index; j<FLIGHTS_PER_SCREEN; i++){
+          fill(255, 125, 0);
+          if (i<=boardTable.getRowCount()){
+            if (boardTable.getFloat(i, 16)==1){
+              text (boardTable.getString(i, 0), FIRST_COLUMN_LOCATION, FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              text (boardTable.getString(i, 4), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              text (boardTable.getString(i, 8), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS*2), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
+              j++;
+            }
+          }
+          else break;
+          delayIndex=i++;
+        } 
+      }
+      else {
+        for (int i=index; i<index+FLIGHTS_PER_SCREEN; i++){
+          if (boardTable.getFloat(i, 15)==1) fill(255, 0, 0);
+          else if (boardTable.getFloat(i, 16)==1) fill(255, 125, 0);
+          else fill(0);
+          if (i<=boardTable.getRowCount()){
             text (boardTable.getString(i, 0), FIRST_COLUMN_LOCATION, FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
             text (boardTable.getString(i, 4), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
             text (boardTable.getString(i, 8), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS*2), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
             j++;
           }
+          else break;
         }
-        else break;
-        delayIndex=i++;
-      } 
-    }
-    else {
-      for (int i=index; i<index+FLIGHTS_PER_SCREEN; i++){
-        if (boardTable.getFloat(i, 15)==1) fill(255, 0, 0);
-        else if (boardTable.getFloat(i, 16)==1) fill(255, 125, 0);
-        else fill(0);
-        if (i<=boardTable.getRowCount()){
-          text (boardTable.getString(i, 0), FIRST_COLUMN_LOCATION, FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-          text (boardTable.getString(i, 4), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-          text (boardTable.getString(i, 8), FIRST_COLUMN_LOCATION + (DISTANCE_BETWEEN_COLUMNS*2), FIRST_ROW_LOCATION+(j*DISTANCE_BETWEEN_ROWS));
-          j++;
-        }
-        else break;
       }
     }
     for(int i = 0; i<screenWidgets.size(); i++){
