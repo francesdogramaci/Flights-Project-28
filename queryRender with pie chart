@@ -1,4 +1,6 @@
-// frances
+// frances 
+// how to call on it in main:
+//  queryRender = new QueryRender(queryFlightEmissions, emissions, queryDepartureTimeCounts, table, searchBar);
 void drawPieChart() {
    
     
