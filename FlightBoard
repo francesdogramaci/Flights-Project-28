@@ -5,15 +5,16 @@ class FlightBoard{
    Table boardTable;
    PImage planeIcon;
    PFont titleFont, headerFont, bodyFont;
-   Widget widgetForward, widgetBackward, widgetCanceled, widgetDelayed, widgetRightNormal, widgetLeftNormal;
+   Widget widgetForward, widgetBackward, widgetCanceled, widgetDelayed, widgetRightNormal, widgetLeftNormal, mainScreen;
    final int EVENT_NULL=0;
    private final int EVENT_FORWARD=1;
    private final int EVENT_BACKWARD=2;
    private final int EVENT_CANCELED= 3;
    private final int EVENT_DELAYED= 4;
    private final int EVENT_NORMAL= 5;
+   private final int EVENT_MAIN_SCREEN= 6;
    private ArrayList BoardScreens, CanceledScreens, DelayedScreens;
-   private BoardScreen currentScreen;
+   private BoardScreen currentBoardScreen;
    private final int FLIGHTS_PER_SCREEN = 18;
    int currentScreenNumber, canceledScreenNumber, delayedScreenNumber, index, cancelIndex, delayIndex;
    boolean canceled, delayed;
@@ -29,6 +30,7 @@ class FlightBoard{
      bodyFont = loadFont("AlNile-20.vlw");
      headerFont = loadFont("AlBayan-Bold-40.vlw");
      planeIcon = loadImage ("IMG_PLANE_ICON.jpeg");
+     mainScreen = new Widget((SCREENX/2)-50, SCREENY-30, 100, 20, "Main Screen", color(120), bodyFont, EVENT_MAIN_SCREEN);
      widgetForward=new Widget(SCREENX-90, SCREENY-30, 80, 20, "Next", color(120), bodyFont, EVENT_FORWARD);
      widgetBackward=new Widget(20, SCREENY-30, 80, 20, "Back", color(120), bodyFont, EVENT_BACKWARD);
      widgetCanceled=new Widget(110, SCREENY-30, 80, 20, "Canceled", color(120), bodyFont, EVENT_CANCELED);
@@ -47,21 +49,22 @@ class FlightBoard{
      canceled = false;
      delayed = false;
      BoardScreens.add (new BoardScreen (0));
-     currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+     currentBoardScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
    }
    
    void draw(){
-     if (currentScreen.index>=FLIGHTS_PER_SCREEN) currentScreen.add(widgetBackward);
-     if (currentScreen.index+FLIGHTS_PER_SCREEN<=boardTable.getRowCount()) currentScreen.add(widgetForward);
-     if (!canceled)currentScreen.add(widgetCanceled);
-     else currentScreen.add(widgetLeftNormal);
-     if (!delayed) currentScreen.add(widgetDelayed);
-     else currentScreen.add(widgetRightNormal);
-     currentScreen.draw();
+     if (currentBoardScreen.index>=FLIGHTS_PER_SCREEN) currentBoardScreen.add(widgetBackward);
+     if (currentBoardScreen.index+FLIGHTS_PER_SCREEN<=boardTable.getRowCount()) currentBoardScreen.add(widgetForward);
+     if (!canceled)currentBoardScreen.add(widgetCanceled);
+     else currentBoardScreen.add(widgetLeftNormal);
+     if (!delayed) currentBoardScreen.add(widgetDelayed);
+     else currentBoardScreen.add(widgetRightNormal);
+     currentBoardScreen.add(mainScreen);
+     currentBoardScreen.draw();
    }
    
    void mousePressed(){
-     switch(currentScreen.getEvent(mouseX, mouseY)) {
+     switch(currentBoardScreen.getEvent(mouseX, mouseY)) {
        case EVENT_FORWARD:
        if (canceled){
          canceledScreenNumber++;
@@ -69,7 +72,7 @@ class FlightBoard{
            //cancelIndex=cancelIndex+FLIGHTS_PER_SCREEN;
            CanceledScreens.add (new BoardScreen (cancelIndex));
          }
-         currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+         currentBoardScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
          println("CANCELED"+ canceledScreenNumber);
        }
        else if (delayed){
@@ -78,7 +81,7 @@ class FlightBoard{
            //delayIndex=delayIndex+FLIGHTS_PER_SCREEN;
            DelayedScreens.add (new BoardScreen (delayIndex));
          }
-         currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+         currentBoardScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
          println("DELAYED"+ delayedScreenNumber);
        }
        else{
@@ -87,24 +90,24 @@ class FlightBoard{
            index=index+FLIGHTS_PER_SCREEN;
            BoardScreens.add (new BoardScreen (index));
          }
-         currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+         currentBoardScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
          println("forward"+ currentScreenNumber);
        }
        break;
        case EVENT_BACKWARD:
        if (canceled){
          canceledScreenNumber--;
-         currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+         currentBoardScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
          println("CANCELED"+ canceledScreenNumber);
        }
        else if(delayed){
          delayedScreenNumber--;
-         currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+         currentBoardScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
          println("DELAYED"+ delayedScreenNumber);
        }
        else{
          currentScreenNumber--;
-         currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+         currentBoardScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
          println("backward"+ currentScreenNumber);
        }
        break;
@@ -114,7 +117,7 @@ class FlightBoard{
        if (canceledScreenNumber>=CanceledScreens.size()){
          CanceledScreens.add (new BoardScreen (cancelIndex));
        }
-       currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+       currentBoardScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
        println("CANCELED"+ canceledScreenNumber);
        break;
        case EVENT_DELAYED:
@@ -123,13 +126,13 @@ class FlightBoard{
        if (delayedScreenNumber>=DelayedScreens.size()){
          DelayedScreens.add (new BoardScreen (delayIndex));
        }
-       currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+       currentBoardScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
        println("DELAYED"+ delayedScreenNumber);
        break;
        case EVENT_NORMAL:
        delayed = false;
        canceled = false;
-       currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+       currentBoardScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
        break;
      }
    }
