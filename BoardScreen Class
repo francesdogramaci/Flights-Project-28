@@ -4,7 +4,7 @@ class BoardScreen {
   private final int TITLE_LOCATION = 30;
   private final int HEADER_LOCATION = TITLE_LOCATION+50;
   private final int FIRST_ROW_LOCATION = HEADER_LOCATION+DISTANCE_BETWEEN_ROWS;
-  private final int DISTANCE_BETWEEN_COLUMNS = 200;
+  private final int DISTANCE_BETWEEN_COLUMNS = 250;
   private final int FIRST_COLUMN_LOCATION = 50;
   private ArrayList boardScreenWidgets;
   color screenColor = 255;
