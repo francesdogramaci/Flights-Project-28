@@ -1,0 +1,134 @@
+//Amelie Bice
+private final int SCREENX = 700;
+private final int SCREENY = 800;
+Table boardTable;
+PImage planeIcon;
+PFont titleFont, headerFont, bodyFont;
+Widget widgetForward, widgetBackward, widgetCanceled, widgetDelayed, widgetRightNormal, widgetLeftNormal;
+final int EVENT_NULL=0;
+private final int EVENT_FORWARD=1;
+private final int EVENT_BACKWARD=2;
+private final int EVENT_CANCELED= 3;
+private final int EVENT_DELAYED= 4;
+private final int EVENT_NORMAL= 5;
+private ArrayList BoardScreens, CanceledScreens, DelayedScreens;
+private BoardScreen currentScreen;
+private final int FLIGHTS_PER_SCREEN = 27;
+int currentScreenNumber, canceledScreenNumber, delayedScreenNumber, index, cancelIndex, delayIndex;
+boolean canceled, delayed;
+
+void settings(){
+   size (SCREENX, SCREENY);
+}
+
+void setup(){
+  boardTable = loadTable("flights_full.csv", "header");
+  textAlign(LEFT, CENTER);
+  titleFont = loadFont("Optima-BoldItalic-30.vlw");
+  bodyFont = loadFont("AlNile-20.vlw");
+  headerFont = loadFont("AlBayan-Bold-40.vlw");
+  planeIcon = loadImage ("IMG_PLANE_ICON.jpeg");
+  widgetForward=new Widget(SCREENX-90, SCREENY-30, 80, 20, "Next", color(120), bodyFont, EVENT_FORWARD);
+  widgetBackward=new Widget(20, SCREENY-30, 80, 20, "Back", color(120), bodyFont, EVENT_BACKWARD);
+  widgetCanceled=new Widget(110, SCREENY-30, 80, 20, "Canceled", color(120), bodyFont, EVENT_CANCELED);
+  widgetDelayed=new Widget(SCREENX-180, SCREENY-30, 80, 20, "Delayed", color(120), bodyFont, EVENT_DELAYED);
+  widgetLeftNormal=new Widget(110, SCREENY-30, 80, 20, "All flights", color(120), bodyFont, EVENT_NORMAL);
+  widgetRightNormal=new Widget(SCREENX-180, SCREENY-30, 80, 20, "All flights", color(120), bodyFont, EVENT_NORMAL);
+  BoardScreens= new ArrayList();
+  CanceledScreens= new ArrayList();
+  DelayedScreens= new ArrayList();
+  currentScreenNumber = 0;
+  canceledScreenNumber = 0;
+  delayedScreenNumber = 0;
+  index = 0;
+  cancelIndex = 0;
+  delayIndex = 0;
+  canceled = false;
+  delayed = false;
+  BoardScreens.add (new BoardScreen (0));
+  currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+}
+
+void draw(){
+  if (currentScreen.index>=FLIGHTS_PER_SCREEN) currentScreen.add(widgetBackward);
+  if (currentScreen.index+FLIGHTS_PER_SCREEN<=boardTable.getRowCount()) currentScreen.add(widgetForward);
+  if (!canceled)currentScreen.add(widgetCanceled);
+  else currentScreen.add(widgetLeftNormal);
+  if (!delayed) currentScreen.add(widgetDelayed);
+  else currentScreen.add(widgetRightNormal);
+  currentScreen.draw();
+}
+
+void mousePressed(){
+  switch(currentScreen.getEvent(mouseX, mouseY)) {
+    case EVENT_FORWARD:
+    if (canceled){
+      canceledScreenNumber++;
+      if (canceledScreenNumber>=CanceledScreens.size()){
+        //cancelIndex=cancelIndex+FLIGHTS_PER_SCREEN;
+        CanceledScreens.add (new BoardScreen (cancelIndex));
+      }
+      currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+      println("CANCELED"+ canceledScreenNumber);
+    }
+    else if (delayed){
+      delayedScreenNumber++;
+      if (delayedScreenNumber>=DelayedScreens.size()){
+        //delayIndex=delayIndex+FLIGHTS_PER_SCREEN;
+        DelayedScreens.add (new BoardScreen (delayIndex));
+      }
+      currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+      println("DELAYED"+ delayedScreenNumber);
+    }
+    else{
+      currentScreenNumber++;
+      if (currentScreenNumber>=BoardScreens.size()){
+        index=index+FLIGHTS_PER_SCREEN;
+        BoardScreens.add (new BoardScreen (index));
+      }
+      currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+      println("forward"+ currentScreenNumber);
+    }
+    break;
+    case EVENT_BACKWARD:
+    if (canceled){
+      canceledScreenNumber--;
+      currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+      println("CANCELED"+ canceledScreenNumber);
+    }
+    else if(delayed){
+      delayedScreenNumber--;
+      currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+      println("DELAYED"+ delayedScreenNumber);
+    }
+    else{
+      currentScreenNumber--;
+      currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+      println("backward"+ currentScreenNumber);
+    }
+    break;
+    case EVENT_CANCELED:
+    canceled = true;
+    delayed = false;
+    if (canceledScreenNumber>=CanceledScreens.size()){
+      CanceledScreens.add (new BoardScreen (cancelIndex));
+    }
+    currentScreen = (BoardScreen) CanceledScreens.get(canceledScreenNumber);
+    println("CANCELED"+ canceledScreenNumber);
+    break;
+    case EVENT_DELAYED:
+    delayed = true;
+    canceled = false;
+    if (delayedScreenNumber>=DelayedScreens.size()){
+      DelayedScreens.add (new BoardScreen (delayIndex));
+    }
+    currentScreen = (BoardScreen) DelayedScreens.get(delayedScreenNumber);
+    println("DELAYED"+ delayedScreenNumber);
+    break;
+    case EVENT_NORMAL:
+    delayed = false;
+    canceled = false;
+    currentScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
+    break;
+  }
+}
