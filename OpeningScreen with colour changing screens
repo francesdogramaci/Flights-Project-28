@@ -26,6 +26,7 @@ SearchBar searchBar;
 SearchBar searchBar2;
 BarChart barChart;
 PieChart pieChart;
+FlightBoard flightBoard;
 
 Screen currentScreen, screen1, screen2, screen3, screen4, screen5;
 
@@ -46,6 +47,7 @@ void setup() {
   searchBar = new SearchBar(50, 300, 200, 30);
   searchBar2 = new SearchBar(550, 300, 200, 30);
   barChart = new BarChart();
+  flightBoard = new FlightBoard();
  
 
   flightDataDB = new ArrayList<>();  
@@ -75,7 +77,7 @@ void setup() {
    screen2.add(widget4); //main screen button
    screen2.add(widget5); // press p box
    screen3.add(widget4); //main screen button
-   screen4.add(widget4); //main screen button
+   //screen4.add(widget4); //main screen button
    screen3.add(widget6); // press d box
   
    currentScreen = screen1;
@@ -139,8 +141,7 @@ void draw()
     pieChart.draw();
   }
   else if(currentScreen == screen4){
-    background(450, 200, 5);
-    currentScreen.draw();
+    flightBoard.draw();
     dropdown.setVisible(false);
   }
   else if(currentScreen == screen5){
