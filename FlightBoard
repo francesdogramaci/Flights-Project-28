@@ -1,6 +1,6 @@
 //Amelie Bice
-private final int SCREENX = 700;
-private final int SCREENY = 800;
+private final int SCREENX = 800;
+private final int SCREENY = 600;
 Table boardTable;
 PImage planeIcon;
 PFont titleFont, headerFont, bodyFont;
@@ -13,7 +13,7 @@ private final int EVENT_DELAYED= 4;
 private final int EVENT_NORMAL= 5;
 private ArrayList BoardScreens, CanceledScreens, DelayedScreens;
 private BoardScreen currentScreen;
-private final int FLIGHTS_PER_SCREEN = 27;
+private final int FLIGHTS_PER_SCREEN = 18;
 int currentScreenNumber, canceledScreenNumber, delayedScreenNumber, index, cancelIndex, delayIndex;
 boolean canceled, delayed;
 
