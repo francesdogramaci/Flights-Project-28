@@ -3,7 +3,7 @@ class TreeChart {
    
     PImage treeImage; 
     int[] C02emissions = {12, 24, 32, 48, 60, 72}; // CO2 emissions in tonnes
-    int[] trees = {2, 4, 5, 7, 9, 11}; // Number of trees needed to offset emissions in billions
+    int[] trees = {2, 4, 5, 7, 9, 11}; // Number of trees needed to offset emissions  
     TreeChart(PImage treeImage)
     {
         this.treeImage = treeImage;
