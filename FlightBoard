@@ -134,6 +134,9 @@ class FlightBoard{
        canceled = false;
        currentBoardScreen = (BoardScreen) BoardScreens.get(currentScreenNumber);
        break;
+       case EVENT_MAIN_SCREEN:
+       currentScreen=screen1;
+       break;
      }
    }
 }
