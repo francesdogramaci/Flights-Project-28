@@ -16,6 +16,4 @@ class Emissions {
   public float calculateEmission(float distance) {
     return distance * AVERAGE_EMISSION_PER_MILE;
   }
-
-  //Single distance
 }

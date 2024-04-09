@@ -1,4 +1,4 @@
-// same main as what lisa put but draws dropdown menu
+// Main - bits of code from everyone
 import controlP5.*;
 
 // Variables
@@ -14,6 +14,7 @@ PFont stdFont; //variable to store font
 boolean keyA = false;
 boolean keyD = false;
 boolean keyO = false;
+boolean isFlightBoardActive = false;
 
 // Constants
 final int SCREENX = 800;
@@ -29,6 +30,7 @@ final int EVENT_TABLE = 7;
 final int EVENT_TREE = 8;
 final int EVENT_BAR = 9;
 final int EVENT_SEARCH = 10;
+final int EVENT_DB = 11;
 
 // Instances
 FlightData flightData;
@@ -39,10 +41,11 @@ SearchBar searchBar2;
 QueryRender queryRender;
 BarChart barChart;
 Dropdown dropdown;
+FlightBoard flightBoard;
 
 
 
-Screen currentScreen, screenMain, screenBar, screenPie, screenSearch, screenOffset, screenBar2, screenSearchResultTree;
+Screen currentScreen, screenMain, screenBar, screenPie, screenSearch, screenOffset, screenBar2, screenSearchResultTree, screenDB;
 
 void settings()
 {
@@ -77,14 +80,15 @@ void setup() {
 
 
 
-  //creating two screen objects
+  //creating screen objects
   screenMain = new Screen();// main screen
   screenBar = new Screen();//bar chart screen
   screenPie = new Screen(); //pie chart screen
   screenSearch = new Screen(); //table screen
   screenOffset = new Screen(); //offset emissions table
   screenBar2 = new Screen(); // other bar chart emissions weekly
-  screenSearchResultTree = new Screen();
+  screenSearchResultTree = new Screen(); // tree emissions
+  screenDB = new Screen(); //departure board
 
   Widget widget1 = new Widget(50, 350, 200, 50, "Average Emissions \n Bar Chart", color(255, 150, 200), stdFont, EVENT_FORWARD);
   Widget widget2 = new Widget(550, 350, 200, 50, "Pie Chart", color(255, 150, 200), stdFont, EVENT_PIE_CHART);
@@ -95,12 +99,14 @@ void setup() {
   Widget widget7 = new Widget(300, 350, 200, 50, "Weekly Total Emissions \n Bar Chart", color(255, 150, 200), stdFont, EVENT_BAR);
   Widget widget8 = new Widget(300, 350, 200, 50, "Search", color(255, 150, 200), stdFont, EVENT_SEARCH);
   Widget widget9 = new Widget(310, 0, 180, 30, "Main Screen", color(255, 150, 200), stdFont, EVENT_BACKWARD); // TOP SCREEN MIDDLE
+  Widget widget10 = new Widget(300, 560, 205, 25, "Departure Board", color(255, 150, 200), stdFont, EVENT_DB);
   //adding widgets to the screen
   screenMain.add(widget1); //bar chart button main screen
   screenMain.add(widget2); //pie chart widget main screen
   screenMain.add(widget3); //departure table widget main screen
   screenMain.add(widget5);
   screenMain.add(widget7);  // add weekly emissions
+  screenMain.add(widget10); // add departure board screen
   screenBar.add(widget6); //main screen button bar chart screen
   screenSearch.add(widget9); //main screen button table screen
   screenPie.add(widget6); //main screen button pie chart screen
@@ -117,7 +123,8 @@ void draw()
   if (currentScreen == screenMain) {
     background(120, 0, 70);
     image(backgroundImage, 0, 0, 800, 600);
-    
+    isFlightBoardActive = false;
+
     // Dropdown menu
     dropdown.setVisible(true);
     fill(0);
@@ -133,21 +140,24 @@ void draw()
     textSize(30);
     text("What is your flights CO2 Emissions?", x+100, y+8); //adjust co ords to centre text
     if (x++>=800) x=-400;
-  // Other Screens draw
+    // Other Screens draw
   } else if (currentScreen == screenBar) {
     background(255);
     currentScreen.draw();
     dropdown.setVisible(false);
+    isFlightBoardActive = false;
     barChart.draw();
   } else if (currentScreen == screenPie) {
     background(255);
     currentScreen.draw();
     dropdown.setVisible(false);
+    isFlightBoardActive = false;
     queryRender.drawPieChart();
   } else if (currentScreen == screenSearch) {
     background(255);
     dropdown.setVisible(false);
     image(backgroundImage, 0, 0, 800, 600);
+    isFlightBoardActive = false;
     noStroke();
     fill(255);
     rect(0, 0, 800, 50);
@@ -172,6 +182,7 @@ void draw()
   } else if (currentScreen == screenOffset) {
     background(255);
     dropdown.setVisible(false);
+    isFlightBoardActive = false;
     currentScreen.draw();
     textAlign(CENTER, CENTER);
     textSize(25);
@@ -208,11 +219,10 @@ void draw()
       textSize(25);
       text("There were " + numOfFlights + " flights from O'Hare International in Jan 2022", 400, 350);
     }
-    
-    
   } else if (currentScreen == screenBar2) {
     background(255);
     dropdown.setVisible(false);
+    isFlightBoardActive = false;
     currentScreen.draw();
     queryRender.drawBarChart();
   } else if (currentScreen == screenSearchResultTree) {
@@ -220,51 +230,64 @@ void draw()
     dropdown.setVisible(false);
     currentScreen.draw();
     queryRender.drawTreeChart();
+    isFlightBoardActive = false;
+  } else if (currentScreen == screenDB) {
+    background(255);
+    dropdown.setVisible(false);
+    isFlightBoardActive = true;
+    flightBoard = new FlightBoard(table);
+    flightBoard.setup();
+    flightBoard.draw();
   }
   currentScreen.draw();
 }
 
 
 void mousePressed() {
-  int event = currentScreen.getEvent(mouseX, mouseY); //getting event based on mouse position
+  if (isFlightBoardActive) {
+    flightBoard.mousePressed();
+  } else {
+    int event = currentScreen.getEvent(mouseX, mouseY); //getting event based on mouse position
+    //handling diff events based on clicked button
+    switch (event) {
+    case EVENT_TABLE:
+      println("Search Screen");
+      currentScreen = screenSearch;
+      break;
+    case EVENT_PIE_CHART:
+      println("Pie Chart!");
+      currentScreen = screenPie;
+      break;
+    case EVENT_FORWARD :
+      currentScreen = screenBar;
+      break;
+    case EVENT_BACKWARD:
+      currentScreen = screenMain;
+      break;
+    case EVENT_TREE:
+      currentScreen = screenOffset;
+      break;
+    case EVENT_BAR:
+      currentScreen = screenBar2;
+      break;
+    case EVENT_SEARCH:
+      currentScreen = screenSearchResultTree;
+      String[] inputs = searchBar.checkAndSendData();
+      queryRender.inputs = inputs;
+      float emission = flightData.queryTreeChart(inputs[0], inputs[1]);
+      queryRender.emission = emission;
+      break;
+    case EVENT_DB:
+      currentScreen = screenDB;
+    default:
+      if (currentScreen == screenMain && event == EVENT_FORWARD) {
+        println("creating new screen");
+        Screen newScreen = new Screen();
+        currentScreen = newScreen;
+      }
 
-  //handling diff events based on clicked button
-  switch (event) {
-  case EVENT_TABLE:
-    println("Search Screen");
-    currentScreen = screenSearch;
-    break;
-  case EVENT_PIE_CHART:
-    println("Pie Chart!");
-    currentScreen = screenPie;
-    break;
-  case EVENT_FORWARD :
-    currentScreen = screenBar;
-    break;
-  case EVENT_BACKWARD:
-    currentScreen = screenMain;
-    break;
-  case EVENT_TREE:
-    currentScreen = screenOffset;
-    break;
-  case EVENT_BAR:
-    currentScreen = screenBar2;
-    break;
-  case EVENT_SEARCH:
-    currentScreen = screenSearchResultTree;
-    String[] inputs = searchBar.checkAndSendData();
-    queryRender.inputs = inputs;
-    float emission = flightData.queryTreeChart(inputs[0], inputs[1]);
-    queryRender.emission = emission;
-    break;
-  default:
-    if (currentScreen == screenMain && event == EVENT_FORWARD) {
-      println("creating new screen");
-      Screen newScreen = new Screen();
-      currentScreen = newScreen;
+      break;
     }
-
-    break;
   }
 }
 
