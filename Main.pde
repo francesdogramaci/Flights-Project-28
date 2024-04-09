@@ -1,4 +1,4 @@
-// Imports
+// same main as what lisa put but draws dropdown menu
 import controlP5.*;
 
 // Variables
@@ -29,7 +29,6 @@ final int EVENT_TABLE = 7;
 final int EVENT_TREE = 8;
 final int EVENT_BAR = 9;
 final int EVENT_SEARCH = 10;
-final int EVENT_FLIGHT_BOARD= 11;
 
 // Instances
 FlightData flightData;
@@ -39,10 +38,11 @@ SearchBar searchBar;
 SearchBar searchBar2;
 QueryRender queryRender;
 BarChart barChart;
-FlightBoard flightBoard;
+Dropdown dropdown;
 
 
-Screen currentScreen, screenMain, screenBar, screenPie, screenSearch, screenOffset, screenBar2, screenSearchResultTree, screenFlightBoard;
+
+Screen currentScreen, screenMain, screenBar, screenPie, screenSearch, screenOffset, screenBar2, screenSearchResultTree;
 
 void settings()
 {
@@ -52,6 +52,7 @@ void settings()
 void setup() {
   // General Setup
   cp5 = new ControlP5(this);
+  dropdown = new Dropdown(cp5);
   backgroundImage = loadImage("plane.jpg");
 
   stdFont = createFont("Chalkboard-30", 50);
@@ -65,7 +66,6 @@ void setup() {
   searchBar = new SearchBar(50, 300, 200, 30, flightData);
   searchBar2 = new SearchBar(550, 300, 200, 30, flightData);
   barChart = new BarChart();
-  flightBoard = new FlightBoard();
 
   // Queries
   float[] queryFlightEmissions = flightData.sortFlightDataEmissions();
@@ -85,7 +85,6 @@ void setup() {
   screenOffset = new Screen(); //offset emissions table
   screenBar2 = new Screen(); // other bar chart emissions weekly
   screenSearchResultTree = new Screen();
-  screenFlightBoard = new Screen();
 
   Widget widget1 = new Widget(50, 350, 200, 50, "Average Emissions \n Bar Chart", color(255, 150, 200), stdFont, EVENT_FORWARD);
   Widget widget2 = new Widget(550, 350, 200, 50, "Pie Chart", color(255, 150, 200), stdFont, EVENT_PIE_CHART);
@@ -96,14 +95,12 @@ void setup() {
   Widget widget7 = new Widget(300, 350, 200, 50, "Weekly Total Emissions \n Bar Chart", color(255, 150, 200), stdFont, EVENT_BAR);
   Widget widget8 = new Widget(300, 350, 200, 50, "Search", color(255, 150, 200), stdFont, EVENT_SEARCH);
   Widget widget9 = new Widget(310, 0, 180, 30, "Main Screen", color(255, 150, 200), stdFont, EVENT_BACKWARD); // TOP SCREEN MIDDLE
-  Widget flightBoardWidget = new Widget (300, 430, 200, 40, "Flight Board", color (255, 150, 200), stdFont, EVENT_FLIGHT_BOARD);
   //adding widgets to the screen
   screenMain.add(widget1); //bar chart button main screen
   screenMain.add(widget2); //pie chart widget main screen
   screenMain.add(widget3); //departure table widget main screen
   screenMain.add(widget5);
   screenMain.add(widget7);  // add weekly emissions
-  screenMain.add(flightBoardWidget);
   screenBar.add(widget6); //main screen button bar chart screen
   screenSearch.add(widget9); //main screen button table screen
   screenPie.add(widget6); //main screen button pie chart screen
@@ -120,6 +117,11 @@ void draw()
   if (currentScreen == screenMain) {
     background(120, 0, 70);
     image(backgroundImage, 0, 0, 800, 600);
+    
+    // Dropdown menu
+    dropdown.setVisible(true);
+    fill(0);
+    text("How would you like to represent your data?", 400, 125);
 
     //creating a moving title screen
     noStroke();
@@ -131,18 +133,25 @@ void draw()
     textSize(30);
     text("What is your flights CO2 Emissions?", x+100, y+8); //adjust co ords to centre text
     if (x++>=800) x=-400;
+  // Other Screens draw
   } else if (currentScreen == screenBar) {
     background(255);
+    currentScreen.draw();
+    dropdown.setVisible(false);
     barChart.draw();
   } else if (currentScreen == screenPie) {
     background(255);
+    currentScreen.draw();
+    dropdown.setVisible(false);
     queryRender.drawPieChart();
   } else if (currentScreen == screenSearch) {
     background(255);
+    dropdown.setVisible(false);
     image(backgroundImage, 0, 0, 800, 600);
     noStroke();
     fill(255);
     rect(0, 0, 800, 50);
+    currentScreen.draw();
     searchBar.draw(color(0), color(255), color(0), color(0));
     searchBar2.draw(color(0), color(255), color(0), color(0));
     // departure text label
@@ -162,6 +171,8 @@ void draw()
     text("Arrival Airport:", 555, 280);
   } else if (currentScreen == screenOffset) {
     background(255);
+    dropdown.setVisible(false);
+    currentScreen.draw();
     textAlign(CENTER, CENTER);
     textSize(25);
     text("Below are the three airports with the most departures per day \n Select the corresponding key for more info", 400, 150);
@@ -201,19 +212,19 @@ void draw()
     
   } else if (currentScreen == screenBar2) {
     background(255);
+    dropdown.setVisible(false);
+    currentScreen.draw();
     queryRender.drawBarChart();
   } else if (currentScreen == screenSearchResultTree) {
     background(255);
+    dropdown.setVisible(false);
+    currentScreen.draw();
     queryRender.drawTreeChart();
   }
-  else if (currentScreen == screenFlightBoard){
-    flightBoard.setup();
-    flightBoard.draw();
-  }
-
-
   currentScreen.draw();
 }
+
+
 void mousePressed() {
   int event = currentScreen.getEvent(mouseX, mouseY); //getting event based on mouse position
 
@@ -245,9 +256,6 @@ void mousePressed() {
     queryRender.inputs = inputs;
     float emission = flightData.queryTreeChart(inputs[0], inputs[1]);
     queryRender.emission = emission;
-    break;
-  case EVENT_FLIGHT_BOARD:
-    currentScreen= screenFlightBoard;
     break;
   default:
     if (currentScreen == screenMain && event == EVENT_FORWARD) {
