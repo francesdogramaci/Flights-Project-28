@@ -1,4 +1,4 @@
-//Amelie Bice
+ //Amelie Bice
 public class FlightBoard {
   Table boardTable;
   PImage planeIcon;

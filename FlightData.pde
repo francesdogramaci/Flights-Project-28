@@ -103,14 +103,32 @@ class FlightData {
     println("No matching flight found");
     return -1; // If no matching flight is found
   }
-  
+
   public int queryCountFlights(String originAirport) {
     int queryFlightCount = 0;
-    for(Flight flight : flightData) {
-      if(flight.getOrigin().equals(originAirport)){
+    for (Flight flight : flightData) {
+      if (flight.getOrigin().equals(originAirport)) {
         queryFlightCount++;
       }
     }
     return queryFlightCount;
+  }
+
+  public String getRandomSentence() {
+    String[] sentences = {
+      "Reduce, reuse, recycle.",
+      "Avoid buying fast fashion, instead opt\n for vintage and recycled clothing.",
+      "Switch lights off and unplug your electeonic\n devices when not in use.",
+      "Sign up to get your electricity from clean energy \nthrough your local utility or a certified renewable\n energy provider.",
+      "Drive less, walk more.",
+      "Fly nonstop since landings and takeoffs use\n more fuel and produce more emissions.",
+      "Vote to let your representatives know you want the to \nphase out fossil fuels to decarbonise the earth.",
+      "  Turn your water heater down to 120˚F.\n This can save about 550 pounds of CO2 a year.",
+      "Support and buy from companies that are\n environmentally responsible.",
+      "Try a Meatless Monday, reducing your consumption\n of meat reduces your carbon emissions."
+    };
+    // generate a random index to select a sentence from the array
+    int randomIndex = int(random(sentences.length));
+    return sentences[randomIndex]; // Return the selected random sentence
   }
 }

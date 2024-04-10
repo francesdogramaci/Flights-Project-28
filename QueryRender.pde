@@ -6,11 +6,15 @@ class QueryRender {
   int[] departureTimeCounts; // departure time counts
   float emission;
   String inputs[];
+  boolean buttonClicked;
+  FlightData flightData;
+  String randomSentence;
 
   QueryRender(float[] queryFlightEmissions, float[] emissions, int[] queryDepartureTimeCounts) {
     this.distanceRanges = queryFlightEmissions;
     this.emissions = emissions;
     this.departureTimeCounts = queryDepartureTimeCounts;
+    this.flightData = new FlightData();
   }
 
 
@@ -151,5 +155,38 @@ class QueryRender {
     rotate(-HALF_PI);
     textAlign(CENTER, CENTER);
     text("Number of Trees Needed to Offset emissions", -height / 2 - 15, 50); // Adjusted position for the title
+  }
+
+  void drawOffsetFacts() {
+    PImage natureBackground;
+    natureBackground = loadImage("natureBackground5.jpg");
+    background(255);
+    image(natureBackground, 0, 0, 800, 600);
+    fill(0);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text("Click for a method to offset your carbon emissions!", 400, 220);
+    fill(#14C11A);
+    ellipse(width/2, height/2, 100, 100);
+
+    if (buttonClicked) {
+      fill(0);
+      textSize(30);
+      textAlign(CENTER, CENTER);
+      text(randomSentence, 400, 400); // Center the text horizontally
+    }
+  }
+
+  void mousePressed() {
+    if (dist(mouseX, mouseY, width/2, height/2) < 50) {
+      // toggle the buttonClicked flag every time the button is clicked
+      buttonClicked = !buttonClicked;
+      if (buttonClicked) {
+        // If buttonClicked is true, select a random sentence
+        randomSentence = flightData.getRandomSentence();
+      }
+    } else {
+      currentScreen=screenMain;
+    }
   }
 }
