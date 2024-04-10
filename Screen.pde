@@ -1,4 +1,4 @@
-//aimee
+//Aimee
 class Screen {
   ArrayList<Widget> screenWidgets;
   color screenColor;

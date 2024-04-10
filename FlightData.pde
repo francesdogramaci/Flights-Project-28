@@ -1,5 +1,6 @@
-import java.util.ArrayList;
 // Lisa
+import java.util.ArrayList;
+
 class FlightData {
   Table table;
   ArrayList<Flight> flightData;

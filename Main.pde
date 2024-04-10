@@ -1,4 +1,4 @@
-// Main - bits of code from everyone
+// Main - code from everyone - mainly Aimee for UI code and others for code relating to individual classes
 import controlP5.*;
 
 // Variables

@@ -1,3 +1,4 @@
+//Frances
 class SearchBar {
   String inputText = "";
   String inputText2 = "";

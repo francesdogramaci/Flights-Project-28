@@ -1,3 +1,4 @@
+//Lisa, Jamie and Orla
 class QueryRender {
 
   float[] distanceRanges; // array w distance in miles
